@@ -30,3 +30,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# github pages deployment files
+.deploy-files
+deploy.sh
