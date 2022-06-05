@@ -75,9 +75,9 @@
         <small class="form-text">Price you're planning to sell at</small>
       </div>
       <div class="mb-2">
-        <small class="control-label mb-1">Gain (USD)</small>
+        <small class="control-label mb-1">Projected Gain:</small>
         <h4 class="my-0">${{ gain }}</h4>
-        <h4 class="d-inline-block my-0 me-1">PHP {{ gainPHP }}</h4><small>(x50)</small>
+        <h4 class="d-inline-block my-0 me-1">PHP {{ gainPHP }}</h4>
       </div>
     </div>
     <div v-if="tab === 1" class="p-4 border border-top-0">
@@ -89,10 +89,12 @@
         <small class="form-text">Price you wanna earn upon selling (in PHP)</small>
       </div>
       <div class="mb-2">
-        <small class="control-label mb-1">Target Sell Price</small>
+        <small class="control-label mb-1">Price you should sell at:</small>
         <h4 class="my-0">{{ targetSellPrice }}</h4>
-        <small class="form-text">Price you should sell at</small>
       </div>
+    </div>
+    <div class="alert alert-warning mt-3" role="alert">
+      * All USD prices are just based on 1 USD is to 50 PHP ratio.
     </div>
   </div>
 
