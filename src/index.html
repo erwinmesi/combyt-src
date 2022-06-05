@@ -25,14 +25,14 @@
     <div class="mb-2">
       <small class="control-label mb-1">Price</small>
       <div class="input-group">
-        <input v-model="price" type="number" class="form-control" placeholder="Price">
+        <input v-model="price" type="number" class="form-control" placeholder="Price" @input="computeTotal">
       </div>
       <small class="form-text">Your entry price</small>
     </div>
     <div class="mb-2">
       <small class="control-label mb-1">Amount</small>
       <div class="input-group">
-        <input v-model="amount" type="number" class="form-control" placeholder="Amount" @input="handleAmountChange">
+        <input v-model="amount" type="number" class="form-control" placeholder="Amount" @input="computeTotal">
       </div>
       <small class="form-text">Coin quantity</small>
     </div>
@@ -45,12 +45,12 @@
       <small class="form-text">Capital in USD</small>
     </div>
     <div class="mb-2">
-      <small class="control-label mb-1">Total (PHP)</small>
+      <small class="control-label mb-1">Total (&#8369;)</small>
       <div class="input-group">
-        <input v-model="phpTotal" type="number" class="form-control" placeholder="Total (PHP)"
+        <input v-model="phpTotal" type="number" class="form-control" placeholder="Total (&#8369;)"
           @input="handlePhpTotalChange">
       </div>
-      <small class="form-text">Capital in PHP</small>
+      <small class="form-text">Capital in &#8369;</small>
     </div>
     <ul class="nav nav-tabs mt-4">
       <li class="nav-item">
@@ -77,16 +77,16 @@
       <div class="mb-2">
         <small class="control-label mb-1">Projected Gain:</small>
         <h4 class="my-0">${{ gain }}</h4>
-        <h4 class="d-inline-block my-0 me-1">PHP {{ gainPHP }}</h4>
+        <h4 class="d-inline-block my-0 me-1">&#8369;{{ gainPHP }}</h4>
       </div>
     </div>
     <div v-if="tab === 1" class="p-4 border border-top-0">
       <div class="mb-2">
-        <small class="control-label mb-1">Target Gain (PHP)</small>
+        <small class="control-label mb-1">Target Gain (&#8369;)</small>
         <div class="input-group">
           <input v-model="targetGainPHP" type="number" class="form-control" placeholder="Target Gain">
         </div>
-        <small class="form-text">Price you wanna earn upon selling (in PHP)</small>
+        <small class="form-text">Price you wanna earn upon selling (in &#8369;)</small>
       </div>
       <div class="mb-2">
         <small class="control-label mb-1">Price you should sell at:</small>
@@ -94,12 +94,12 @@
       </div>
     </div>
     <div class="alert alert-warning mt-3" role="alert">
-      * All USD prices are just based on 1 USD is to 50 PHP ratio.
+      * All USD prices are just based on 1 USD is to 50 &#8369;ratio.
     </div>
   </div>
 
   <script>
-    const roundOff = (number, precision = 4) => +(number.toFixed(precision))
+    const roundOff = (number, precision = 8) => +(number.toFixed(precision))
 
     new Vue({
       el: '#app',
@@ -123,11 +123,11 @@
         },
 
         gainPHP() {
-          return +((this.gain * 50).toFixed(4))
+          return roundOff(this.gain * 50)
         },
 
         targetGainUSD() {
-          return roundOff((+this.targetGainPHP / 50))
+          return roundOff(+this.targetGainPHP / 50)
         },
 
         targetSellPrice() {
@@ -135,12 +135,12 @@
             return 0
           }
 
-          return roundOff((+this.usdTotal + +this.targetGainUSD) / this.amount, 6)
+          return roundOff((+this.usdTotal + +this.targetGainUSD) / this.amount)
         }
       },
 
       methods: {
-        handleAmountChange() {
+        computeTotal() {
           const usdTotal = this.price * this.amount
           this.usdTotal = roundOff(usdTotal)
           this.phpTotal = roundOff((this.usdTotal * 50))
@@ -157,7 +157,7 @@
           const amount = this.price ? (usdTotal / this.price) : 0
           this.amount = roundOff(amount)
           this.usdTotal = usdTotal
-        },
+        }
       },
     })
   </script>
