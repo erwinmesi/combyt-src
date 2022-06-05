@@ -1,12 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.0-alpha.4/vue.min.js"></script>
   <title>Combyt</title>
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Hello from Combyt!</h1>
+  <div id="app" class="p-4">
+    <div class="mb-4">
+      <h4 class="my-0">Combyt</h4>
+      <small>Compute before you trade!</small>
+    </div>
+    <div class="mb-2">
+      <small class="control-label mb-1">Price</small>
+      <div class="input-group">
+        <input v-model="price" type="number" class="form-control" placeholder="Price">
+      </div>
+      <small class="form-text">Your entry price</small>
+    </div>
+    <div class="mb-2">
+      <small class="control-label mb-1">Amount</small>
+      <div class="input-group">
+        <input v-model="amount" type="number" class="form-control" placeholder="Amount" @input="handleAmountChange">
+      </div>
+      <small class="form-text">Coin quantity</small>
+    </div>
+    <div class="mb-2">
+      <small class="control-label mb-1">Total (USD)</small>
+      <div class="input-group">
+        <input v-model="usdTotal" type="number" class="form-control" placeholder="Total (USD)"
+          @input="handleUsdTotalChange">
+      </div>
+      <small class="form-text">Capital in USD</small>
+    </div>
+    <div class="mb-2">
+      <small class="control-label mb-1">Total (PHP)</small>
+      <div class="input-group">
+        <input v-model="phpTotal" type="number" class="form-control" placeholder="Total (PHP)"
+          @input="handlePhpTotalChange">
+      </div>
+      <small class="form-text">Capital in PHP</small>
+    </div>
+    <ul class="nav nav-tabs mt-4">
+      <li class="nav-item">
+        <span class="nav-link" :class="[{active : tab === 0}, tab === 0? 'text-primary' : 'text-muted']"
+          @click="tab = 0">
+          Compute Gain
+        </span>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link" :class="[{active : tab === 1}, tab === 1? 'text-primary' : 'text-muted']"
+          @click="tab = 1">
+          Compute Sell Price
+        </span>
+      </li>
+    </ul>
+    <div v-if="tab === 0" class="p-4 border border-top-0">
+      <div class="mb-2">
+        <small class="control-label mb-1">Sell Price</small>
+        <div class="input-group">
+          <input v-model="sellPrice" type="number" class="form-control" placeholder="Sell Price">
+        </div>
+        <small class="form-text">Price you're planning to sell at</small>
+      </div>
+      <div class="mb-2">
+        <small class="control-label mb-1">Gain (USD)</small>
+        <h4 class="my-0">${{ gain }}</h4>
+        <h4 class="d-inline-block my-0 me-1">PHP {{ gainPHP }}</h4><small>(x50)</small>
+      </div>
+    </div>
+    <div v-if="tab === 1" class="p-4 border border-top-0">
+      <div class="mb-2">
+        <small class="control-label mb-1">Target Gain (PHP)</small>
+        <div class="input-group">
+          <input v-model="targetGainPHP" type="number" class="form-control" placeholder="Target Gain">
+        </div>
+        <small class="form-text">Price you wanna earn upon selling (in PHP)</small>
+      </div>
+      <div class="mb-2">
+        <small class="control-label mb-1">Target Sell Price</small>
+        <h4 class="my-0">{{ targetSellPrice }}</h4>
+        <small class="form-text">Price you should sell at</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const roundOff = (number, precision = 4) => +(number.toFixed(precision))
+
+    new Vue({
+      el: '#app',
+
+      data() {
+        return {
+          tab: 0,
+          price: 0,
+          amount: 0,
+          usdTotal: 0,
+          phpTotal: 0,
+          sellPrice: 0,
+          targetGainPHP: 0,
+        }
+      },
+
+      computed: {
+        gain() {
+          const assetsBought = this.sellPrice * this.amount
+          return roundOff(assetsBought - this.usdTotal)
+        },
+
+        gainPHP() {
+          return +((this.gain * 50).toFixed(4))
+        },
+
+        targetGainUSD() {
+          return roundOff((+this.targetGainPHP / 50))
+        },
+
+        targetSellPrice() {
+          if (!this.amount) {
+            return 0
+          }
+
+          return roundOff((+this.usdTotal + +this.targetGainUSD) / this.amount, 6)
+        }
+      },
+
+      methods: {
+        handleAmountChange() {
+          const usdTotal = this.price * this.amount
+          this.usdTotal = roundOff(usdTotal)
+          this.phpTotal = roundOff((this.usdTotal * 50))
+        },
+
+        handleUsdTotalChange() {
+          const amount = this.price ? (this.usdTotal / this.price) : 0
+          this.amount = roundOff(amount)
+          this.phpTotal = roundOff((this.usdTotal * 50))
+        },
+
+        handlePhpTotalChange() {
+          const usdTotal = roundOff((this.phpTotal / 50))
+          const amount = this.price ? (usdTotal / this.price) : 0
+          this.amount = roundOff(amount)
+          this.usdTotal = usdTotal
+        },
+      },
+    })
+  </script>
 </body>
+
 </html>
